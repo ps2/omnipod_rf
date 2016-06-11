@@ -32,6 +32,8 @@ def get_phase(samples, samples_per_bit):
     cumulWidths = crossings[1:] - crossings[0]
     widths = (cumulWidths[1:] - cumulWidths[:-1])
     filtered_widths = widths[(widths > 46) & (widths < 55)]
+    if filtered_widths.size == 0:
+        return -1
     samples_per_bit = filtered_widths.mean()
     return (crossings % samples_per_bit).mean()
 
@@ -41,15 +43,14 @@ def resample(samples, offset, step):
     return (centers, np.interp(centers, xp, samples))
 
 def sample_bits(samples, samples_per_bit, phase_offset):
-    samples_per_bit = 50.41
     bit_center_offset = phase_offset - (samples_per_bit / 2.0)
     (centers, bits) = resample(samples, bit_center_offset, samples_per_bit)
     bits = (bits > 0).astype(int)
     return bits
 
-def manchester_decode(bits, mode='ieee'):
+def manchester_decode(bits, manchester_variant):
     decoded = []
-    if mode == 'ieee':
+    if manchester_variant == 'ieee':
         hi_low = 0
         low_hi = 1
     else:
@@ -75,17 +76,21 @@ def manchester_decode(bits, mode='ieee'):
         decoded.append(d)
     return np.array(decoded)
 
-def find_end_of_preamble(bits, preamble_byte = 0x57):
+def find_end_of_preamble(bits, preamble_byte):
     preamble = np.unpackbits(np.array([preamble_byte], dtype=np.uint8))
     for i in range(0, bits.size):
         if (bits[i:i+8] == preamble).all() and not (bits[i+8:i+16] == preamble).all():
             return i
     return -1
 
-def decode_packet(samples, samples_per_bit):
+def decode_packet(samples, samples_per_bit, manchester_variant='ieee', preamble_byte=0x54):
     phase = get_phase(samples, samples_per_bit)
+    if phase < 0:
+        return []
     raw_bits = sample_bits(samples, samples_per_bit, phase)
-    m_bits = manchester_decode(raw_bits, 'g_e_thomas')
+    if raw_bits.size == 0:
+        return []
+    m_bits = manchester_decode(raw_bits, manchester_variant)
     bits = np.trim_zeros(m_bits + 1) - 1 # Trim leading and trailing errors
-    byte_start = find_end_of_preamble(bits)
+    byte_start = find_end_of_preamble(bits, preamble_byte)
     return np.packbits(bits[byte_start:])

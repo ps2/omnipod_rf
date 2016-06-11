@@ -16,15 +16,20 @@ def main(options=None):
     demod.run()
 
     sample_rate = 2048000      # sample rate of sdr
-    samples_per_bit = 50.4185  # This was computed based on previously seen data.
+    samples_per_bit = 50.41    # This was computed based on previously seen data.
 
     samples = np.fromfile('.demod.dat',dtype=np.float32)
     packets_offsets = omni.find_offsets(samples,samples_per_bit)
 
     for po in packets_offsets:
         packet_samples = samples[slice(*po)]
-        bytes = omni.decode_packet(packet_samples, samples_per_bit)
-        print "".join([format(n, '02x') for n in bytes])
+        bytes = omni.decode_packet(
+            packet_samples,
+            samples_per_bit,
+            manchester_variant='ieee',
+            preamble_byte=0x54)
+        hex_str = "".join([format(n, '02x') for n in bytes])
+        print "%sms: %s" % (int((po[0]/float(sample_rate))*1000), hex_str)
 
 if __name__ == '__main__':
     main()
