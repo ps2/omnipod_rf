@@ -1,1 +1,4 @@
 *.pyc
+top_block.py
+.ipynb_checkpoints
+.demod.dat
