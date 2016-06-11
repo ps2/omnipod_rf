@@ -81,3 +81,11 @@ def find_end_of_preamble(bits, preamble_byte = 0x57):
         if (bits[i:i+8] == preamble).all() and not (bits[i+8:i+16] == preamble).all():
             return i
     return -1
+
+def decode_packet(samples, samples_per_bit):
+    phase = get_phase(samples, samples_per_bit)
+    raw_bits = sample_bits(samples, samples_per_bit, phase)
+    m_bits = manchester_decode(raw_bits, 'g_e_thomas')
+    bits = np.trim_zeros(m_bits + 1) - 1 # Trim leading and trailing errors
+    byte_start = find_end_of_preamble(bits)
+    return np.packbits(bits[byte_start:])
