@@ -13,7 +13,7 @@ I use [SDR# (SDR Sharp)](http://airspy.com/download/) to capture my iq files, an
 
 It should look like this in the end:
 
-![alt text](https://files.slack.com/files-tmb/T0B2X082E-F1FL1CK7F-fffd8ffa8e/pdm_1_packet_1024.png "Logo Title Text 1")
+![alt text](https://files.slack.com/files-tmb/T0B2X082E-F1FL1CK7F-fffd8ffa8e/pdm_1_packet_1024.png "PDM signal")
 
 Notice that the signal appears to be alternating between two different frequencies. This is [FSK](https://en.wikipedia.org/wiki/Frequency-shift_keying) modulation.  If the signal is too weak (the waves are small), move the pod/pdm closer.  If the waves are clipped at the top, the signal is too strong.
 
