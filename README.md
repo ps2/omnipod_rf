@@ -20,19 +20,18 @@ Notice that the signal appears to be alternating between two different frequenci
 ## Running the decoder
 
 ```
-$python omni_decode.py find_pdm.wav
+$ python omni_decode.py find_pdm.wav 
 Filename = find_pdm.wav
 Using Volk machine: avx_64_mmx
-158ms: 54c3000000005c00000000fbf9f8fbe0feb7d4fc8072
-457ms: 54c3000000005c00000000fbf9f8fbe0feb7d4fc8072
-756ms: 54c3000000005c00000000fbf9f8fbe0feb7d4fc8072
-1055ms: 54c3000000005c00000000fbf9f8fbe0feb7d4fc8072
-1353ms: 54c3000000005c00000000fbf9f8fbe0feb7d4fc8072
-1652ms: 54c3000000005c00000000fbf9f8fbe0feb7d4fc8072
-1951ms: 54c3000000005c00000000fbf9f8fbe0feb7d4fc8072
-2093ms:
-2250ms: 54c3000000005c00000000fbf9f8fbe0feb7d4fc8072
-2549ms: 54c3000000005c00000000fbf9f8fbe0feb7d4fc8072
-2848ms: 54c3000000005c00000000fbf9f8fbe0feb7d4fc8072
-3146ms: 54c3000000005c00000000fbf9f8fbe0feb7d4fc8072
+158ms: ffffffffa3ffffffff040607041f01482b037f8d
+457ms: ffffffffa3ffffffff040607041f01482b037f8d
+756ms: ffffffffa3ffffffff040607041f01482b037f8d
+1055ms: ffffffffa3ffffffff040607041f01482b037f8d
+1353ms: ffffffffa3ffffffff040607041f01482b037f8d
+1652ms: ffffffffa3ffffffff040607041f01482b037f8d
+1951ms: ffffffffa3ffffffff040607041f01482b037f8d
+2250ms: ffffffffa3ffffffff040607041f01482b037f8d
+2549ms: ffffffffa3ffffffff040607041f01482b037f8d
+2848ms: ffffffffa3ffffffff040607041f01482b037f8d
+3146ms: ffffffffa3ffffffff040607041f01482b037f8d
 ```
