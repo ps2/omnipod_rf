@@ -26,8 +26,8 @@ def main(options=None):
         bytes = omni.decode_packet(
             packet_samples,
             samples_per_bit,
-            manchester_variant='ieee',
-            preamble_byte=0x54)
+            manchester_variant='g_e_thomas',
+            preamble_byte=0xab)
         hex_str = "".join([format(n, '02x') for n in bytes])
         if len(hex_str) > 0:
             print "%sms: %s" % (int((po[0]/float(sample_rate))*1000), hex_str)
