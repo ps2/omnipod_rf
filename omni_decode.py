@@ -29,7 +29,8 @@ def main(options=None):
             manchester_variant='ieee',
             preamble_byte=0x54)
         hex_str = "".join([format(n, '02x') for n in bytes])
-        print "%sms: %s" % (int((po[0]/float(sample_rate))*1000), hex_str)
+        if len(hex_str) > 0:
+            print "%sms: %s" % (int((po[0]/float(sample_rate))*1000), hex_str)
 
 if __name__ == '__main__':
     main()
