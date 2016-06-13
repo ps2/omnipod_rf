@@ -1,5 +1,6 @@
 # Decode Omnipod RF Packets
 
+This repo contains tools for working with raw iq data from an SDR, and will decode the omnipod signal into packets.  For more information about the omnipod protocol, see the [omnidocs repo](https://github.com/openaps/omnidocs).
 
 ## Prerequisites
 
