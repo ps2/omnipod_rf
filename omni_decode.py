@@ -29,7 +29,8 @@ def main(options=None):
             manchester_variant='g_e_thomas',
             preamble_byte=0xab)
         hex_str = "".join([format(n, '02x') for n in bytes])
-        if len(hex_str) > 0:
+        computed_crc = omni.compute_crc(str(bytearray(bytes[:-1])))
+        if len(hex_str) > 0 and computed_crc == bytes[-1:]:
             print "%sms: %s" % (int((po[0]/float(sample_rate))*1000), hex_str)
 
 if __name__ == '__main__':

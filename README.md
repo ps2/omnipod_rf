@@ -10,7 +10,7 @@ This repo contains tools for working with raw iq data from an SDR, and will deco
 
 ## Capturing data
 
-I use [SDR# (SDR Sharp)](http://airspy.com/download/) to capture my iq files, and there are many different ways of doing this. But whatever software you use, you'll need to capture at 2024000 samples per second, and tune your SDR to 433.90MHz.
+I use [SDR# (SDR Sharp)](http://airspy.com/download/) to capture my iq files, and there are many different ways of doing this. But whatever software you use, you'll need to capture at 2024000 samples per second. *NOTE* While the signal is at 433.923MHz, we don't want to use that as our SDR center, as we will run into center DC noise issues. The code needs to know what offset we're using, so I have dictated an offset of 460kHz.  Thus, set your SDR to capture at *433.463MHz*
 
 It should look like this in the end:
 
@@ -21,7 +21,7 @@ Notice that the signal appears to be alternating between two different frequenci
 ## Running the decoder
 
 ```
-$ python omni_decode.py find_pdm.wav 
+$ python omni_decode.py find_pdm.wav
 Filename = find_pdm.wav
 Using Volk machine: avx_64_mmx
 158ms: ffffffffa3ffffffff040607041f01482b037f8d

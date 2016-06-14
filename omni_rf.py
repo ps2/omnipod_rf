@@ -1,4 +1,5 @@
 import numpy as np
+import crcmod
 
 def rolling(a, window):
     shape = (a.size - window + 1, window)
@@ -78,9 +79,11 @@ def manchester_decode(bits, manchester_variant):
 
 def find_end_of_preamble(bits, preamble_byte):
     preamble = np.unpackbits(np.array([preamble_byte], dtype=np.uint8))
+    if bits.size < 24:
+        return -1
     for i in range(0, bits.size):
         if (bits[i:i+8] == preamble).all() and not (bits[i+8:i+16] == preamble).all():
-            return i
+            return i+16 # Skip sync word
     return -1
 
 def decode_packet(samples, samples_per_bit, manchester_variant='ieee', preamble_byte=0x54):
@@ -88,9 +91,14 @@ def decode_packet(samples, samples_per_bit, manchester_variant='ieee', preamble_
     if phase < 0:
         return []
     raw_bits = sample_bits(samples, samples_per_bit, phase)
-    if raw_bits.size == 0:
+    if raw_bits.size < 48: # Need at least 3 bytes
         return []
     m_bits = manchester_decode(raw_bits, manchester_variant)
     bits = np.trim_zeros(m_bits + 1) - 1 # Trim leading and trailing errors
     byte_start = find_end_of_preamble(bits, preamble_byte)
     return np.packbits(bits[byte_start:])
+
+def compute_crc(data):
+    #omnicrc8 = crcmod.mkCrcFun(0x1e0, initCrc=0xce, xorOut=0x00)
+    omnicrc8 = crcmod.predefined.mkCrcFun('crc-8')
+    return omnicrc8(data)
