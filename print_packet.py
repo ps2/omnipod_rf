@@ -22,8 +22,8 @@ def main(options=None):
     body = ""
     message_type = ""
     if len(hex_str) > 20:
-        unknown = hex_str[18:2]
-        message_type = hex_str[18:2]
+        unknown = hex_str[18:20]
+        message_type = ord(hex_str[20:22].decode("hex"))
         body = hex_str[22:-2]
     crc = ord(hex_str[-2:].decode("hex"))
 
@@ -37,13 +37,14 @@ def main(options=None):
             "packet_type": packet_type,
             "sequence": sequence,
             "pod_address_2": pod_address_2,
+            "message_type": message_type,
             "body": body,
             "crc": crc,
             "raw_packet": hex_str,
         }
         print json.dumps(obj, sort_keys=True,indent=4, separators=(',', ': '))
     else:
-        print "ID1:%s PTYPE:%s SEQ:%d ID2:%s MTYPE:%s BODY:%s CRC:%02x" % (pod_address_1, format(packet_type, '#05b')[2:], sequence, pod_address_2, message_type, body, crc)
+        print "ID1:%s PTYPE:%s SEQ:%d ID2:%s MTYPE:%02x BODY:%s CRC:%02x" % (pod_address_1, format(packet_type, '#05b')[2:], sequence, pod_address_2, message_type, body, crc)
 
 if __name__ == '__main__':
     main()
