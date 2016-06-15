@@ -5,7 +5,7 @@ import numpy as np
 import omni_rf as omni
 import sys
 
-def show_packet(samples, offsets, samples_per_bit, sample_rate):
+def show_packet(samples, offsets, streaming_offset, samples_per_bit, sample_rate):
     packet_samples = samples[slice(*offsets)]
     bytes = omni.decode_packet(
         packet_samples,
@@ -72,10 +72,10 @@ def main(options=None):
         demod.run()
 
         samples = np.fromfile('.demod.dat',dtype=np.float32)
-        packets_offsets = omni.find_offsets(samples,samples_per_bit, sample_rate)
+        packets_offsets = omni.find_offsets(samples,samples_per_bit)
 
         for po in packets_offsets:
-            show_packet(samples, po, samples_per_bit)
+            show_packet(samples, po, 0, samples_per_bit, sample_rate)
 
 if __name__ == '__main__':
     main()

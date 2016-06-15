@@ -61,8 +61,8 @@ class FskDemod(gr.top_block):
         self.connect((self.low_pass_filter_1, 0), (self.blocks_add_const_vxx_0, 0))
 
         if input_file != None:
-            self.connect((self.blocks_wavfile_source_0, 0), (self.blocks_float_to_complex_0, 0))
-            self.connect((self.blocks_wavfile_source_0, 1), (self.blocks_float_to_complex_0, 1))
+            self.connect((self.blocks_wavfile_source_0, 1), (self.blocks_float_to_complex_0, 0))
+            self.connect((self.blocks_wavfile_source_0, 0), (self.blocks_float_to_complex_0, 1))
             self.connect((self.blocks_float_to_complex_0, 0), (self.blocks_multiply_xx_0, 0))
         else:
             self.connect((self.rtlsdr_source_0, 0), (self.blocks_multiply_xx_0, 0))

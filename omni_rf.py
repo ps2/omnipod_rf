@@ -7,7 +7,7 @@ def rolling(a, window):
     return np.lib.stride_tricks.as_strided(a, shape=shape, strides=strides)
 
 
-def find_offsets(samples, samples_per_bit, minimum_bits=80):
+def find_offsets(samples, samples_per_bit, minimum_bits=80, sensitivity=1):
     signs = np.array(samples >= 0, int)
     differences = np.diff(signs)
     crossings = np.nonzero((differences < 0) | (differences > 0))[0]
@@ -20,7 +20,7 @@ def find_offsets(samples, samples_per_bit, minimum_bits=80):
     # Rolling 4 point average of phase; if we're within a half sample of the
     # expected bitrate, then this is packet data.
     packet_detect = np.absolute(rolling(phases, 4).mean(axis=1) - samples_per_bit)
-    packet_detect = rolling(packet_detect, 4).max(axis=1) < 0.5
+    packet_detect = rolling(packet_detect, 4).max(axis=1) < sensitivity
 
     # Bookend
     packet_detect_crossings = np.nonzero(np.diff(packet_detect))[0]
