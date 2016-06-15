@@ -15,7 +15,8 @@ def show_packet(samples, offsets, streaming_offset, samples_per_bit, sample_rate
     hex_str = "".join([format(n, '02x') for n in bytes])
     computed_crc = omni.compute_crc(str(bytearray(bytes[:-1])))
     if len(hex_str) > 0 and computed_crc == bytes[-1:]:
-        print "%sms: %s" % (int((offsets[0]/float(sample_rate))*1000), hex_str)
+        sample_num = streaming_offset + offsets[0]
+        print "%sms: %s" % (int((sample_num/float(sample_rate))*1000), hex_str)
 
 def main(options=None):
 
@@ -30,12 +31,21 @@ def main(options=None):
     filename = args.filename[0]
     if filename == "-":
         print "Reading demodulated signal from stdin"
-        bits_per_chunk = 200000
+        bits_per_chunk = 2000
         bytes_per_sample = 4
         samples_per_chunk = int(bits_per_chunk * samples_per_bit)
         bytes_per_chunk = samples_per_chunk * bytes_per_sample
 
         samples = np.array([], dtype=np.float32)
+        streaming_offset = 0
+
+        header = sys.stdin.read(115)
+        if header[:18] == 'Using Volk machine':
+            print "Skipping extraneous gnuradio header."
+        else:
+            # This is valid data; keep it. 
+            header += sys.stdin.read(1) # byte align to size of float32
+            samples = np.frombuffer(header, dtype=np.float32)
 
         try:
             while True:
@@ -44,10 +54,10 @@ def main(options=None):
                     break
                 print "Read %d bytes" % len(new_bytes)
                 samples = np.append(samples, np.frombuffer(new_bytes, dtype=np.float32))
-                packets_offsets = omni.find_offsets(samples,samples_per_bit)
+                packets_offsets = omni.find_offsets(samples,samples_per_bit, 80,1)
                 if len(packets_offsets) == 0:
                     # Keep the last chunk
-                    print "Dropping "
+                    streaming_offset += len(samples) - samples_per_chunk
                     samples = samples[-samples_per_chunk:]
                     continue
                 else:
@@ -61,8 +71,9 @@ def main(options=None):
                         print "num bits = %s" % num_bits
                         if num_bits > 20 and packet_end < (len(samples) - (samples_per_bit*5)):
                             print "processing"
-                            show_packet(samples, packet_offset, samples_per_bit, sample_rate)
+                            show_packet(samples, packet_offset, streaming_offset, samples_per_bit, sample_rate)
                             end_of_last_processed_packet = packet_end
+                    streaming_offset += end_of_last_processed_packet
                     samples = samples[end_of_last_processed_packet:]
         except KeyboardInterrupt:
             pass
@@ -75,7 +86,7 @@ def main(options=None):
         packets_offsets = omni.find_offsets(samples,samples_per_bit)
 
         for po in packets_offsets:
-            show_packet(samples, po, 0, samples_per_bit, sample_rate)
+            show_packet(samples, po, streaming_offset, samples_per_bit, sample_rate)
 
 if __name__ == '__main__':
     main()

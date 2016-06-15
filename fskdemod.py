@@ -44,8 +44,11 @@ class FskDemod(gr.top_block):
 
         self.blocks_multiply_xx_0 = blocks.multiply_vcc(1)
         self.blocks_float_to_complex_0 = blocks.float_to_complex(1)
-        self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_float*1, output_file, False)
-        self.blocks_file_sink_0.set_unbuffered(False)
+        if output_file == '-':
+            self.blocks_file_sink_0 = blocks.file_descriptor_sink(4, 1)
+        else:
+            self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_float*1, output_file, False)
+            self.blocks_file_sink_0.set_unbuffered(False)
         self.blocks_add_const_vxx_0 = blocks.add_const_vff((0.00, ))
         self.analog_sig_source_x_0 = analog.sig_source_c(samp_rate, analog.GR_COS_WAVE, -420000, 1, 0)
         self.analog_quadrature_demod_cf_0 = analog.quadrature_demod_cf(1)
