@@ -7,7 +7,7 @@ def rolling(a, window):
     return np.lib.stride_tricks.as_strided(a, shape=shape, strides=strides)
 
 
-def find_offsets(samples, samples_per_bit):
+def find_offsets(samples, samples_per_bit, minimum_bits=80):
     signs = np.array(samples >= 0, int)
     differences = np.diff(signs)
     crossings = np.nonzero((differences < 0) | (differences > 0))[0]
@@ -23,8 +23,8 @@ def find_offsets(samples, samples_per_bit):
     startstop = np.nonzero(np.diff(packet_detect))[0].reshape(-1, 2)
     startstop[:,1] += 8
     startstop[:,0] += 1
-    packet_offsets = cumul_widths.take(startstop)
-    return packet_offsets
+    offsets = [x for x in cumul_widths.take(startstop) if (x[1] - x[0]) >= (minimum_bits*samples_per_bit)]
+    return offsets
 
 def get_phase(samples, samples_per_bit):
     signs = np.array(samples >= 0, int)
