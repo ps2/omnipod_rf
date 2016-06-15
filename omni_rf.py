@@ -17,10 +17,20 @@ def find_offsets(samples, samples_per_bit, minimum_bits=80):
     # rotate phases on left side to right
     phases[phases<(samples_per_bit/2)]+=samples_per_bit
 
+    # Rolling 4 point average of phase; if we're within a half sample of the
+    # expected bitrate, then this is packet data.
     packet_detect = np.absolute(rolling(phases, 4).mean(axis=1) - samples_per_bit)
     packet_detect = rolling(packet_detect, 4).max(axis=1) < 0.5
 
-    startstop = np.nonzero(np.diff(packet_detect))[0].reshape(-1, 2)
+    # Bookend
+    packet_detect_crossings = np.nonzero(np.diff(packet_detect))[0]
+    if packet_detect[0]:
+        packet_detect_crossings = np.insert(packet_detect_crossings, 0, 0)
+    if packet_detect[-1]:
+        packet_detect_crossings = np.append(packet_detect_crossings, len(cumul_widths)-9)
+    #print "packet_detect[0] = %s" % packet_detect[0]
+    #print "packet_detect_crossings = %s" % packet_detect_crossings
+    startstop = packet_detect_crossings.reshape(-1, 2)
     startstop[:,1] += 8
     startstop[:,0] += 1
     offsets = [x for x in cumul_widths.take(startstop) if (x[1] - x[0]) >= (minimum_bits*samples_per_bit)]
@@ -81,7 +91,7 @@ def find_end_of_preamble(bits, preamble_byte):
     preamble = np.unpackbits(np.array([preamble_byte], dtype=np.uint8))
     if bits.size < 24:
         return -1
-    for i in range(0, bits.size):
+    for i in range(0, bits.size-16):
         if (bits[i:i+8] == preamble).all() and not (bits[i+8:i+16] == preamble).all():
             return i+16 # Skip sync word
     return -1

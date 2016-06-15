@@ -5,7 +5,6 @@ from gnuradio import filter
 from gnuradio import gr
 from gnuradio.eng_option import eng_option
 from gnuradio.filter import firdes
-import osmosdr
 
 class FskDemod(gr.top_block):
 
@@ -27,7 +26,9 @@ class FskDemod(gr.top_block):
 
         if input_file != None:
             self.blocks_wavfile_source_0 = blocks.wavfile_source(input_file, False)
-        else: 
+        else:
+            import osmosdr
+
             self.rtlsdr_source_0 = osmosdr.source( args="numchan=" + str(1) + " " + "" )
             self.rtlsdr_source_0.set_sample_rate(samp_rate)
             self.rtlsdr_source_0.set_center_freq(433463000, 0)
