@@ -101,11 +101,15 @@ def decode_packet(samples, samples_per_bit, manchester_variant='ieee', preamble_
     if phase < 0:
         return []
     raw_bits = sample_bits(samples, samples_per_bit, phase)
+    #print "raw_bits = %s" % "".join(map(str, raw_bits))
     if raw_bits.size < 48: # Need at least 3 bytes
         return []
     m_bits = manchester_decode(raw_bits, manchester_variant)
     bits = np.trim_zeros(m_bits + 1) - 1 # Trim leading and trailing errors
+    #print "bits = %s" % "".join(map(str, bits))
+
     byte_start = find_end_of_preamble(bits, preamble_byte)
+    #print "byte_start = %s" % byte_start
     return np.packbits(bits[byte_start:])
 
 def compute_crc(data):
